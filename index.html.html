@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>نظام المسوحات الصفية — مدرسة البخاري الشاملة</title>
+<style>
+/* ============================================================
+   BASE
+============================================================ */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --mint:#2ecc8f;--mint-l:#e8faf3;--mint-d:#1a8f63;
+  --sky:#5bb8f5;--lav:#9b7fe8;--peach:#ff8c69;--rose:#ff6b9d;
+}
+body{font-family:'Segoe UI',Tahoma,'Arial Unicode MS',Arial,sans-serif;direction:rtl;background:#f7fdf9;color:#1a2e22;font-size:14px}
+.app{display:flex;flex-direction:column;min-height:100vh}
+
+/* ============================================================
+   HEADER
+============================================================ */
+.header{background:linear-gradient(135deg,#0f6e56 0%,#2ecc8f 40%,#5bb8f5 75%,#9b7fe8 100%);position:sticky;top:0;z-index:100;box-shadow:0 3px 18px rgba(15,110,86,0.28)}
+.header-inner{display:flex;align-items:center;gap:14px;padding:10px 20px}
+.school-logo{width:68px;height:68px;border-radius:14px;object-fit:cover;border:2.5px solid rgba(255,255,255,0.55);flex-shrink:0;background:rgba(255,255,255,0.15)}
+.header-text{flex:1;min-width:0}
+.header-text h1{font-size:19px;font-weight:800;color:#fff;letter-spacing:.2px;line-height:1.25}
+.header-text .school-sub{font-size:14px;color:rgba(255,255,255,.92);font-weight:700;margin-top:3px}
+.header-text .supervisor{font-size:13px;color:rgba(255,255,255,.82);margin-top:2px}
+.header-actions{display:flex;gap:7px;flex-shrink:0;flex-wrap:wrap}
+.btn-hdr{padding:8px 15px;border-radius:20px;border:2px solid rgba(255,255,255,.65);background:rgba(255,255,255,.18);color:#fff;cursor:pointer;font-size:12px;font-family:inherit;font-weight:700;transition:all .15s;white-space:nowrap}
+.btn-hdr:hover{background:rgba(255,255,255,.32)}
+.btn-hdr.solid{background:#fff;color:#1a8f63;border-color:#fff}
+.btn-hdr.solid:hover{background:#e8faf3}
+.btn-hdr.excel{background:#1D6F42;border-color:#1D6F42}
+.btn-hdr.excel:hover{background:#155330}
+.btn-hdr:disabled{opacity:.5;cursor:not-allowed}
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+.main{display:flex;flex:1}
+.sidebar{width:215px;flex-shrink:0;background:#fff;border-left:1px solid #d4f0e4;padding:16px 10px;display:flex;flex-direction:column;gap:5px}
+.sidebar-head{font-size:10px;color:#7bb89a;font-weight:800;padding:4px 10px;letter-spacing:.8px;margin-bottom:4px}
+.nav-item{padding:10px 14px;border-radius:12px;cursor:pointer;font-size:13px;color:#4a7a60;transition:all .15s;display:flex;align-items:center;gap:10px;font-weight:500;user-select:none}
+.nav-item:hover{background:#e8faf3;color:#1a8f63}
+.nav-item.active{background:linear-gradient(135deg,#e8faf3,#eaf6ff);color:#1a8f63;font-weight:700;border:1px solid #b8e8d4}
+.nav-dot{width:9px;height:9px;border-radius:50%;background:#2ecc8f;flex-shrink:0}
+.nav-item:nth-child(3) .nav-dot{background:#5bb8f5}
+.nav-item:nth-child(4) .nav-dot{background:#9b7fe8}
+.content{flex:1;overflow-y:auto;padding:20px;background:#f7fdf9}
+.section{display:none}.section.active{display:block}
+
+/* ============================================================
+   CARDS / FORMS
+============================================================ */
+.card{background:#fff;border:1px solid #d4f0e4;border-radius:16px;padding:18px 20px;margin-bottom:16px;box-shadow:0 1px 6px rgba(46,204,143,.07)}
+.card-title{font-size:13px;font-weight:700;margin-bottom:14px;padding-bottom:10px;border-bottom:1px dashed #d4f0e4;color:#1a8f63;display:flex;align-items:center;gap:7px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:11px;color:#6b9980;font-weight:700;letter-spacing:.3px}
+.form-group input,.form-group select,.form-group textarea{padding:10px 13px;border:1.5px solid #c8e8d8;border-radius:10px;background:#f7fdf9;color:#1a2e22;font-family:inherit;font-size:13px;transition:border-color .15s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:#2ecc8f;background:#fff}
+.skills-list{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;min-height:28px}
+.skill-tag{display:flex;align-items:center;gap:7px;padding:6px 13px;border-radius:20px;font-size:12px;font-weight:600}
+.skill-tag:nth-child(4n+1){background:#e8faf3;color:#1a8f63;border:1px solid #b8e8d4}
+.skill-tag:nth-child(4n+2){background:#eaf6ff;color:#1a6fa5;border:1px solid #b8d8f4}
+.skill-tag:nth-child(4n+3){background:#f3efff;color:#6344b8;border:1px solid #c8b8f0}
+.skill-tag:nth-child(4n+4){background:#fff0eb;color:#c05a30;border:1px solid #f5c4b3}
+.skill-tag .rm{cursor:pointer;font-size:16px;line-height:1;opacity:.6}.skill-tag .rm:hover{opacity:1}
+.skill-input-row{display:flex;gap:8px;align-items:flex-end}
+.btn{padding:9px 18px;border-radius:10px;border:1.5px solid #c8e8d8;background:#fff;color:#1a8f63;cursor:pointer;font-size:13px;font-family:inherit;font-weight:600;transition:all .15s}
+.btn:hover{background:#e8faf3;border-color:#2ecc8f}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-mint{background:#2ecc8f;color:#fff;border-color:#2ecc8f}
+.btn-mint:hover:not(:disabled){background:#1a8f63;border-color:#1a8f63}
+.btn-rose{background:#ff6b9d;color:#fff;border-color:#ff6b9d}.btn-rose:hover{background:#d04070}
+.btn-sm{padding:6px 13px;font-size:12px}
+.btn-xs{padding:3px 9px;font-size:11px;border-radius:8px}
+.questions-list{display:flex;flex-direction:column;gap:8px}
+.q-item{display:flex;gap:8px;align-items:center;background:#f7fdf9;padding:10px 13px;border-radius:12px;border:1px solid #d4f0e4}
+.q-num{font-size:11px;color:#6b9980;font-weight:700;min-width:26px;text-align:center;background:#e8faf3;padding:4px 7px;border-radius:6px}
+.q-input{flex:1;padding:6px 10px;border:1.5px solid #c8e8d8;border-radius:8px;background:#fff;color:#1a2e22;font-family:inherit;font-size:12px}
+.q-input:focus{outline:none;border-color:#2ecc8f}
+.q-select{padding:6px 9px;border:1.5px solid #c8e8d8;border-radius:8px;background:#fff;color:#1a2e22;font-family:inherit;font-size:12px}
+.q-mark{width:60px;padding:6px 8px;border:1.5px solid #c8e8d8;border-radius:8px;background:#fff;color:#1a2e22;font-family:inherit;font-size:12px;text-align:center}
+.cls-chip{display:flex;align-items:center;justify-content:space-between;padding:11px 15px;border-radius:12px;margin-bottom:8px;border:1px solid}
+
+/* ============================================================
+   GRADES TABLE
+============================================================ */
+.tabs{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+.tab{padding:7px 18px;cursor:pointer;font-size:13px;color:#6b9980;border-radius:20px;border:1.5px solid #d4f0e4;background:#fff;font-weight:500;transition:all .15s;user-select:none}
+.tab.active{background:linear-gradient(135deg,#2ecc8f,#5bb8f5);color:#fff;border-color:transparent;font-weight:700}
+.tab:hover:not(.active){background:#e8faf3;border-color:#2ecc8f;color:#1a8f63}
+.paste-hint{font-size:12px;color:#6b9980;background:#f7fdf9;border:1px dashed #c8e8d8;border-radius:10px;padding:8px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.grades-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.grades-table th{background:#f7fdf9;padding:10px 11px;text-align:center;font-weight:700;font-size:11px;color:#6b9980;border-bottom:1.5px solid #d4f0e4}
+.grades-table th:first-child{text-align:right}
+.grades-table td{padding:6px 8px;border-bottom:1px solid #edf8f3;text-align:center}
+.grades-table td:first-child{text-align:right;font-weight:600;padding-right:12px}
+.grades-table tr:last-child td{border-bottom:none}
+.grades-table tr:hover td{background:#f0fbf6}
+.g-input{width:64px;padding:5px 8px;border:1.5px solid #c8e8d8;border-radius:8px;background:#fff;color:#1a2e22;font-family:inherit;font-size:13px;text-align:center}
+.g-input:focus{outline:none;border-color:#2ecc8f}
+.g-input.over{border-color:#ff6b9d;background:#fff0f5}
+
+/* ============================================================
+   ANALYSIS
+============================================================ */
+.stats-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin-bottom:16px}
+.stat-card{border-radius:14px;padding:15px;text-align:center}
+.stat-card:nth-child(1){background:#e8faf3;border:1px solid #b8e8d4}
+.stat-card:nth-child(2){background:#eaf6ff;border:1px solid #b8d8f4}
+.stat-card:nth-child(3){background:#f3efff;border:1px solid #c8b8f0}
+.stat-card:nth-child(4){background:#fff0eb;border:1px solid #f5c4b3}
+.stat-label{font-size:11px;font-weight:700;margin-bottom:7px}
+.stat-card:nth-child(1) .stat-label{color:#1a8f63}
+.stat-card:nth-child(2) .stat-label{color:#1a6fa5}
+.stat-card:nth-child(3) .stat-label{color:#6344b8}
+.stat-card:nth-child(4) .stat-label{color:#c05a30}
+.stat-value{font-size:26px;font-weight:700}
+.stat-card:nth-child(1) .stat-value{color:#2ecc8f}
+.stat-card:nth-child(2) .stat-value{color:#5bb8f5}
+.stat-card:nth-child(3) .stat-value{color:#9b7fe8}
+.stat-card:nth-child(4) .stat-value{color:#ff8c69}
+.bar-wrap{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.bar-label-txt{font-size:12px;width:115px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar-track{flex:1;height:18px;background:#f0fbf6;border-radius:9px;overflow:hidden;border:1px solid #d4f0e4}
+.bar-fill{height:100%;border-radius:9px;transition:width .4s}
+.bar-pct{font-size:12px;font-weight:700;width:40px;text-align:right}
+.badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:11px;font-weight:700;background:#e8faf3;color:#1a8f63;border:1px solid #b8e8d4}
+.empty{text-align:center;padding:48px;color:#6b9980}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.motivate{background:linear-gradient(135deg,#e8faf3,#eaf6ff 50%,#f3efff);border:1px solid #c8e8d8;border-radius:14px;padding:13px 18px;margin-bottom:16px;display:flex;align-items:center;gap:11px;font-size:13px;color:#2a6a4a;font-weight:500}
+.motivate-icon{font-size:24px;flex-shrink:0}
+.send-status{display:flex;align-items:center;gap:9px;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;margin-bottom:12px}
+.send-status.sending{background:#eaf6ff;color:#1a6fa5;border:1px solid #b8d8f4}
+.send-status.ok{background:#e8faf3;color:#1a8f63;border:1px solid #b8e8d4}
+.send-status.err{background:#fff0f5;color:#c04060;border:1px solid #f5b8d4}
+.spinner{width:17px;height:17px;border:2.5px solid currentColor;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.chart-container{overflow-x:auto}
+.chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px;justify-content:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:12px;color:#4a7a60;font-weight:600}
+.legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+
+/* ============================================================
+   MODAL
+============================================================ */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,46,34,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:#fff;border-radius:20px;padding:24px;width:460px;max-width:100%;border:1px solid #d4f0e4;box-shadow:0 8px 32px rgba(46,204,143,.18)}
+.modal-hdr{font-size:16px;font-weight:700;color:#1a8f63;margin-bottom:18px;display:flex;justify-content:space-between;align-items:center}
+.modal-close{cursor:pointer;color:#6b9980;font-size:24px;line-height:1}.modal-close:hover{color:#ff6b9d}
+
+/* ============================================================
+   TOAST
+============================================================ */
+#toastContainer{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:999;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:#1a2e22;color:#fff;padding:11px 22px;border-radius:22px;font-size:13px;font-weight:600;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}
+.toast.success{background:#2ecc8f}
+.toast.warn{background:#ff8c69}
+.toast.error{background:#ff6b9d}
+
+/* ============================================================
+   SEND MODAL — choice + contact info
+============================================================ */
+.send-modal{background:#fff;border-radius:22px;padding:28px;width:500px;max-width:96vw;border:1px solid #d4f0e4;box-shadow:0 12px 40px rgba(46,204,143,.2)}
+.send-modal-hdr{font-size:17px;font-weight:800;color:#1a2e22;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.send-modal-sub{font-size:13px;color:#6b9980;margin-bottom:22px}
+.method-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.method-card{border:2px solid #d4f0e4;border-radius:16px;padding:18px 14px;cursor:pointer;text-align:center;transition:all .18s;background:#fff;user-select:none}
+.method-card:hover{border-color:#2ecc8f;background:#f0fbf6;transform:translateY(-2px)}
+.method-card.selected{border-color:#2ecc8f;background:#e8faf3;box-shadow:0 0 0 3px rgba(46,204,143,.18)}
+.method-card.wa.selected{border-color:#25D366;background:#e8fdf0;box-shadow:0 0 0 3px rgba(37,211,102,.18)}
+.method-card .mc-icon{font-size:38px;margin-bottom:8px;display:block}
+.method-card .mc-label{font-size:14px;font-weight:700;color:#1a2e22}
+.method-card .mc-desc{font-size:11px;color:#6b9980;margin-top:3px}
+.contact-field{margin-bottom:18px}
+.contact-field label{display:block;font-size:12px;color:#6b9980;font-weight:700;margin-bottom:6px;letter-spacing:.3px}
+.contact-field input{width:100%;padding:11px 14px;border:1.5px solid #c8e8d8;border-radius:11px;background:#f7fdf9;color:#1a2e22;font-family:inherit;font-size:14px;transition:border-color .15s}
+.contact-field input:focus{outline:none;border-color:#2ecc8f;background:#fff}
+.send-info-box{background:#e8faf3;border:1px solid #b8e8d4;border-radius:10px;padding:10px 14px;font-size:12px;color:#1a8f63;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start}
+.send-info-box.wa-box{background:#e8fdf0;border-color:#a8e8c0;color:#1a6f40}
+.send-actions{display:flex;gap:10px;justify-content:flex-end}
+.progress-bar-wrap{background:#f0fbf6;border-radius:8px;height:8px;overflow:hidden;margin:10px 0}
+.progress-bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,#2ecc8f,#5bb8f5);transition:width .4s}
+.step-indicator{display:flex;gap:6px;justify-content:center;margin-bottom:20px}
+.step-dot{width:8px;height:8px;border-radius:50%;background:#d4f0e4;transition:background .3s}
+.step-dot.active{background:#2ecc8f}
+
+/* ============================================================
+   PRINT — Arabic-safe PDF via window.print()
+============================================================ */
+@media print{
+  /* hide everything except the print report */
+  body > *{display:none !important}
+  #printReport{display:block !important}
+
+  #printReport{
+    position:fixed;inset:0;
+    font-family:'Segoe UI',Tahoma,'Arial Unicode MS',Arial,sans-serif;
+    direction:rtl;font-size:11pt;color:#111;background:#fff;
+  }
+
+  @page{size:A4 portrait;margin:12mm 10mm}
+
+  .pr-page{page-break-after:always;padding:0}
+  .pr-page:last-child{page-break-after:avoid}
+
+  .pr-header{
+    background:#2ecc8f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;
+    border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;margin-bottom:14px
+  }
+  .pr-logo{width:56px;height:56px;border-radius:10px;object-fit:cover;border:2px solid rgba(255,255,255,.5);flex-shrink:0}
+  .pr-htxt h1{font-size:15pt;font-weight:800;color:#fff;margin:0 0 3px}
+  .pr-htxt p{font-size:10pt;color:rgba(255,255,255,.9);margin:1px 0;font-weight:600}
+
+  .pr-meta{display:flex;gap:16px;font-size:9.5pt;background:#e8faf3;border-radius:8px;padding:7px 14px;margin-bottom:12px;flex-wrap:wrap}
+  .pr-meta span{color:#1a8f63;font-weight:600}
+  .pr-meta b{color:#1a2e22}
+
+  .pr-section-title{font-size:12pt;font-weight:800;color:#1a8f63;border-bottom:2px solid #2ecc8f;padding-bottom:4px;margin:14px 0 8px}
+
+  .pr-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+  .pr-stat{background:#e8faf3 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;border-radius:8px;padding:8px;text-align:center;border:1px solid #b8e8d4}
+  .pr-stat .lbl{font-size:8pt;color:#1a8f63;font-weight:700;margin-bottom:3px}
+  .pr-stat .val{font-size:16pt;font-weight:800;color:#1a8f63}
+
+  .pr-table{width:100%;border-collapse:collapse;font-size:9pt;margin-bottom:10px}
+  .pr-table th{background:#2ecc8f !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;color:#fff;padding:6px 8px;text-align:center;font-weight:700;border:1px solid #1a8f63}
+  .pr-table th:first-child{text-align:right}
+  .pr-table td{padding:5px 8px;border:1px solid #d4f0e4;text-align:center}
+  .pr-table td:first-child{text-align:right;font-weight:600}
+  .pr-table tr:nth-child(even) td{background:#f0fbf6 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-table .pct-hi{color:#1a8f63;font-weight:700}
+  .pr-table .pct-md{color:#7a5e00;font-weight:700}
+  .pr-table .pct-lo{color:#c04030;font-weight:700}
+
+  .pr-skill-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:9.5pt}
+  .pr-skill-name{width:120px;font-weight:600;color:#1a2e22}
+  .pr-skill-bar-wrap{flex:1;height:10px;background:#e8faf3;border-radius:5px;overflow:hidden;border:1px solid #b8e8d4}
+  .pr-skill-bar{height:100%;border-radius:5px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .pr-skill-pct{width:36px;font-weight:700;text-align:right}
+
+  .pr-footer{font-size:8pt;color:#6b9980;text-align:center;margin-top:14px;padding-top:8px;border-top:1px solid #d4f0e4}
+}
+
+/* hidden by default in screen */
+#printReport{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ========== HEADER ========== -->
+<div class="header">
+  <div class="header-inner">
+    <img id="logoImg"
+      src="https://i.postimg.cc/BvWRyPMg/IMG-20260330-WA0066.jpg"
+      class="school-logo" alt="شعار المدرسة"
+      onerror="this.style.display='none'"/>
+    <div class="header-text">
+      <h1>نظام المسوحات الصفية والتقييم البديل</h1>
+      <div class="school-sub">مدرسة البخاري الشاملة</div>
+      <div class="supervisor">مركزة التقييم: منى مصطفى</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-hdr" onclick="exportPDF()">📥 تصدير PDF</button>
+      <button class="btn-hdr excel" onclick="exportExcel()">📊 تصدير Excel</button>
+      <button class="btn-hdr solid" id="sendBtnHeader" onclick="openSendModal()">🚀 إرسال للمركزة</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-head">القائمة</div>
+    <div class="nav-item active" onclick="showSec('setup')" id="nav-setup"><div class="nav-dot"></div>بناء هيكل المسح</div>
+    <div class="nav-item" onclick="showSec('grades')" id="nav-grades"><div class="nav-dot"></div>إدخال العلامات</div>
+    <div class="nav-item" onclick="showSec('analysis')" id="nav-analysis"><div class="nav-dot"></div>لوحة التحليل</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ========== SETUP ========== -->
+    <div class="section active" id="section-setup">
+      <div class="motivate"><span class="motivate-icon">🌸</span>مرحباً! كل مسح تبنيه خطوة نحو فهم أعمق لاحتياجات طلابك.</div>
+      <div class="card">
+        <div class="card-title">📋 معلومات المسح</div>
+        <div class="form-row">
+          <div class="form-group"><label>اسم المعلم</label><input id="teacherName" placeholder="مثال: أحمد محمد"/></div>
+          <div class="form-group"><label>المادة الدراسية</label><input id="subject" placeholder="مثال: اللغة العربية"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>الفصل الدراسي</label>
+            <select id="semester"><option>الفصل الأول</option><option>الفصل الثاني</option><option>الفصل الثالث</option></select>
+          </div>
+          <div class="form-group"><label>السنة الدراسية</label><input id="year" value="2024-2025"/></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 المهارات المقيّمة</div>
+        <div class="skills-list" id="skillsList"><span style="font-size:12px;color:#6b9980">لم تُضف مهارات بعد</span></div>
+        <div class="skill-input-row">
+          <div class="form-group" style="flex:1"><input id="skillInput" placeholder="اكتب اسم المهارة واضغط Enter أو إضافة..."/></div>
+          <button class="btn btn-mint btn-sm" onclick="addSkill()">+ إضافة</button>
+        </div>
+        <p style="font-size:11px;color:#6b9980;margin-top:7px">مثال: فهم المعنى الخفي، تعبير كتابي، تحليل النص...</p>
+      </div>
+      <div class="card">
+        <div class="card-title">📝 الأسئلة والعلامات القصوى</div>
+        <div class="questions-list" id="questionsList"><p style="font-size:12px;color:#6b9980">لا أسئلة بعد.</p></div>
+        <button class="btn btn-sm" style="margin-top:12px" onclick="addQuestion()">+ إضافة سؤال</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🏫 الصفوف الدراسية</div>
+        <div id="classesSummary"><p style="font-size:12px;color:#6b9980">لا صفوف مضافة.</p></div>
+        <button class="btn btn-mint" style="margin-top:14px" onclick="openAddClassModal()">+ إضافة صف جديد</button>
+      </div>
+    </div>
+
+    <!-- ========== GRADES ========== -->
+    <div class="section" id="section-grades">
+      <div class="motivate"><span class="motivate-icon">🌼</span>كل علامة تُدخلها معلومة تساعد في دعم نجاح طلابك!</div>
+      <div class="paste-hint">
+        💡 <span>يمكنك <strong>نسخ البيانات من Excel</strong> (عمود العلامات) ثم الضغط على أول خلية في الصف والضغط <kbd style="background:#e8faf3;border:1px solid #b8e8d4;border-radius:4px;padding:1px 5px;font-size:11px">Ctrl+V</kbd> للصق تلقائياً</span>
+      </div>
+      <div class="tabs" id="classTabs"></div>
+      <div id="gradesContent"></div>
+    </div>
+
+    <!-- ========== ANALYSIS ========== -->
+    <div class="section" id="section-analysis">
+      <div class="motivate"><span class="motivate-icon">🌈</span>البيانات تكشف الحقيقة — استخدم هذا التحليل لتخطيط خطوتك التالية!</div>
+      <div id="sendStatusBox"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+        <button class="btn btn-sm" onclick="exportPDF()">📥 تصدير PDF</button>
+        <button class="btn btn-sm" style="background:#1D6F42;color:#fff;border-color:#1D6F42" onclick="exportExcel()">📊 تصدير Excel</button>
+        <button class="btn btn-mint btn-sm" id="sendBtn2" onclick="openSendModal()">🚀 إرسال لمركزة التقييم</button>
+      </div>
+      <div id="analysisContent"></div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- ========== MODAL ========== -->
+<div class="modal-overlay" id="addClassModal">
+  <div class="modal">
+    <div class="modal-hdr">🏫 إضافة صف جديد<span class="modal-close" onclick="closeModal()">×</span></div>
+    <div class="form-group" style="margin-bottom:13px">
+      <label>اسم الصف</label>
+      <input id="newClassName" placeholder="مثال: السابع ج"/>
+    </div>
+    <div class="form-group" style="margin-bottom:18px">
+      <label>قائمة أسماء الطلاب — كل اسم في سطر منفصل</label>
+      <textarea id="newClassStudents" rows="8"
+        placeholder="مثال:&#10;عمر خالد&#10;سارة أحمد&#10;محمد علي&#10;ليلى حسن"
+        style="resize:vertical;width:100%;padding:10px 13px;border:1.5px solid #c8e8d8;border-radius:12px;background:#f7fdf9;color:#1a2e22;font-family:inherit;font-size:13px"></textarea>
+      <span style="font-size:11px;color:#6b9980;margin-top:4px">يمكنك أيضاً نسخ العمود من Excel ولصقه هنا مباشرة</span>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:9px">
+      <button class="btn btn-sm" onclick="closeModal()">إلغاء</button>
+      <button class="btn btn-mint btn-sm" onclick="saveNewClass()">حفظ وإنشاء الجدول ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SEND MODAL ========== -->
+<div class="modal-overlay" id="sendModal">
+  <div class="send-modal">
+
+    <!-- Step 1: Choose method -->
+    <div id="sendStep1">
+      <div class="send-modal-hdr">
+        إرسال التقرير للمركزة
+        <span class="modal-close" onclick="closeSendModal()">×</span>
+      </div>
+      <div class="send-modal-sub">اختر طريقة الإرسال المناسبة</div>
+      <div class="step-indicator"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="method-cards">
+        <div class="method-card" id="mc-email" onclick="selectMethod('email')">
+          <span class="mc-icon">📧</span>
+          <div class="mc-label">بريد إلكتروني</div>
+          <div class="mc-desc">إرسال ملف Excel + PDF عبر تطبيق البريد</div>
+        </div>
+        <div class="method-card wa" id="mc-wa" onclick="selectMethod('whatsapp')">
+          <span class="mc-icon">💬</span>
+          <div class="mc-label">واتساب</div>
+          <div class="mc-desc">إرسال رسالة واتساب مع ملخص التقرير</div>
+        </div>
+      </div>
+      <div class="send-actions">
+        <button class="btn btn-sm" onclick="closeSendModal()">إلغاء</button>
+        <button class="btn btn-mint btn-sm" id="step1Next" onclick="goStep2()" disabled style="opacity:.5;cursor:not-allowed">التالي ←</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Contact info -->
+    <div id="sendStep2" style="display:none">
+      <div class="send-modal-hdr">
+        <span id="step2Title">بيانات التواصل</span>
+        <span class="modal-close" onclick="closeSendModal()">×</span>
+      </div>
+      <div class="send-modal-sub" id="step2Sub"></div>
+      <div class="step-indicator"><div class="step-dot"></div><div class="step-dot active"></div><div class="step-dot"></div></div>
+      <div class="contact-field" id="contactFieldWrap">
+        <label id="contactLabel">البريد الإلكتروني لمركزة التقييم</label>
+        <input id="contactInput" type="email" placeholder="mona@school.edu.jo"/>
+      </div>
+      <div class="send-info-box" id="sendInfoBox">
+        📎 سيتم تحضير ملف Excel وملف PDF وفتح تطبيق البريد مباشرةً مع المرفقات جاهزة.
+      </div>
+      <div class="send-actions">
+        <button class="btn btn-sm" onclick="goStep1()">← رجوع</button>
+        <button class="btn btn-mint btn-sm" onclick="goStep3()">إرسال التقرير ←</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Sending / result -->
+    <div id="sendStep3" style="display:none">
+      <div class="send-modal-hdr">
+        <span id="step3Title">جارٍ الإرسال...</span>
+        <span class="modal-close" onclick="closeSendModal()">×</span>
+      </div>
+      <div class="step-indicator"><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot active"></div></div>
+      <div id="step3Body" style="text-align:center;padding:20px 0">
+        <div style="font-size:40px;margin-bottom:12px">⏳</div>
+        <p style="color:#6b9980;font-size:13px">يرجى الانتظار...</p>
+      </div>
+      <div class="progress-bar-wrap" id="progressWrap">
+        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="send-actions" style="justify-content:center;margin-top:8px">
+        <button class="btn btn-mint btn-sm" id="closeAfterSend" onclick="closeSendModal()" style="display:none">✓ إغلاق</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========== PRINT REPORT (hidden, shown only on print) ========== -->
+<div id="printReport"></div>
+
+<div id="toastContainer"></div>
+
+<!-- SheetJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+var S={skills:[],questions:[],classes:{},activeClass:null};
+var qCount=0;
+var WEB_APP_URL='https://script.google.com/macros/s/AKfycbx7axnJ_Z_MvFgE1LVq7Kij0QKOG7ZzReEUVLetQKCrine4Wbr4mVtWUypUlAoTYKr8PQ/exec';
+var CLASS_COLORS=['#2ecc8f','#5bb8f5','#9b7fe8','#ff8c69','#f5c842','#ff6b9d','#1D9E75','#378ADD'];
+
+/* ============================================================
+   UTILS
+============================================================ */
+function toast(msg,type,dur){
+  var c=document.getElementById('toastContainer');
+  var d=document.createElement('div');d.className='toast '+(type||'');d.textContent=msg;c.appendChild(d);
+  requestAnimationFrame(function(){d.classList.add('show')});
+  setTimeout(function(){d.classList.remove('show');setTimeout(function(){d.remove()},400)},dur||2800);
+}
+function showSec(id){
+  document.querySelectorAll('.section').forEach(function(s){s.classList.remove('active')});
+  document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active')});
+  document.getElementById('section-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+  if(id==='grades') renderGrades();
+  if(id==='analysis') renderAnalysis();
+}
+function getStudentTotal(st,qs){
+  var s=0;qs.forEach(function(q,qi){s+=parseFloat(st.grades['q'+qi])||0;});return s;
+}
+function computeSkillPct(students,qs,si){
+  var total=0,got=0;
+  qs.forEach(function(q,qi){if(q.skill===si){students.forEach(function(st){total+=q.maxMark;got+=parseFloat(st.grades['q'+qi])||0;});}});
+  return total?Math.round(got/total*100):null;
+}
+function getClassBins(students,qs){
+  var tM=qs.reduce(function(a,q){return a+q.maxMark;},0);var bins=[0,0,0,0];
+  students.forEach(function(st){var p=tM?getStudentTotal(st,qs)/tM*100:0;if(p<=40)bins[0]++;else if(p<=60)bins[1]++;else if(p<=80)bins[2]++;else bins[3]++;});
+  return bins;
+}
+function pctClass(p){return p>=80?'pct-hi':p>=60?'pct-md':'pct-lo';}
+function evalStr(p){return p>=80?'ممتاز':p>=60?'جيد':p>=40?'مقبول':'يحتاج دعم';}
+
+/* ============================================================
+   SKILLS
+============================================================ */
+function addSkill(){
+  var v=document.getElementById('skillInput').value.trim();
+  if(!v){toast('أدخل اسم المهارة','warn');return;}
+  if(S.skills.indexOf(v)>=0){toast('هذه المهارة موجودة','warn');return;}
+  S.skills.push(v);document.getElementById('skillInput').value='';
+  renderSkills();toast('تمت إضافة: '+v,'success');
+}
+document.getElementById('skillInput').addEventListener('keydown',function(e){if(e.key==='Enter')addSkill();});
+function renderSkills(){
+  var el=document.getElementById('skillsList');
+  if(!S.skills.length){el.innerHTML='<span style="font-size:12px;color:#6b9980">لم تُضف مهارات بعد</span>';return;}
+  el.innerHTML=S.skills.map(function(s,i){return '<div class="skill-tag">'+s+'<span class="rm" onclick="removeSkill('+i+')">×</span></div>';}).join('');
+}
+function removeSkill(i){var r=S.skills.splice(i,1);renderSkills();toast('حُذفت: '+r[0]);}
+
+/* ============================================================
+   QUESTIONS
+============================================================ */
+function addQuestion(){
+  if(!S.skills.length){toast('أضف مهارات أولاً','warn');return;}
+  qCount++;S.questions.push({id:qCount,text:'سؤال '+qCount,skill:0,maxMark:5});renderQuestions();
+}
+function renderQuestions(){
+  var el=document.getElementById('questionsList');
+  if(!S.questions.length){el.innerHTML='<p style="font-size:12px;color:#6b9980">لا أسئلة بعد.</p>';return;}
+  el.innerHTML=S.questions.map(function(q,i){
+    var opts=S.skills.map(function(s,si){return '<option value="'+si+'"'+(q.skill===si?' selected':'')+'>'+s+'</option>';}).join('');
+    return '<div class="q-item"><span class="q-num">س'+(i+1)+'</span>'
+      +'<input class="q-input" value="'+q.text+'" onchange="S.questions['+i+'].text=this.value"/>'
+      +'<select class="q-select" onchange="S.questions['+i+'].skill=parseInt(this.value)">'+opts+'</select>'
+      +'<input class="q-mark" type="number" value="'+q.maxMark+'" min="1" onchange="S.questions['+i+'].maxMark=Math.max(1,parseInt(this.value)||1);this.value=S.questions['+i+'].maxMark"/>'
+      +'<button class="btn btn-xs btn-rose" onclick="removeQuestion('+i+')">×</button></div>';
+  }).join('');
+}
+function removeQuestion(i){S.questions.splice(i,1);renderQuestions();}
+
+/* ============================================================
+   CLASSES
+============================================================ */
+function openAddClassModal(){
+  if(!S.questions.length){toast('أضف أسئلة أولاً','warn');return;}
+  document.getElementById('newClassName').value='';
+  document.getElementById('newClassStudents').value='';
+  document.getElementById('addClassModal').classList.add('open');
+}
+function closeModal(){document.getElementById('addClassModal').classList.remove('open');}
+function saveNewClass(){
+  var name=document.getElementById('newClassName').value.trim();
+  var raw=document.getElementById('newClassStudents').value;
+  if(!name){toast('أدخل اسم الصف','warn');return;}
+  var students=raw.split('\n').map(function(s){return s.trim();}).filter(function(s){return s.length>0;});
+  if(!students.length){toast('أدخل أسماء الطلاب','warn');return;}
+  S.classes[name]={name:name,students:students.map(function(s){return{name:s,grades:{}};})};
+  if(!S.activeClass) S.activeClass=name;
+  closeModal();renderClassesSummary();
+  toast('تم إنشاء صف "'+name+'" بـ '+students.length+' طالب 🎉','success',3500);
+}
+function renderClassesSummary(){
+  var el=document.getElementById('classesSummary');var keys=Object.keys(S.classes);
+  if(!keys.length){el.innerHTML='<p style="font-size:12px;color:#6b9980">لا صفوف مضافة.</p>';return;}
+  el.innerHTML=keys.map(function(k,ki){
+    var col=CLASS_COLORS[ki%CLASS_COLORS.length];
+    return '<div class="cls-chip" style="border-color:'+col+'44;background:'+col+'11"><span style="font-size:13px;font-weight:700;color:'+col+'">'+k+' <span class="badge">'+S.classes[k].students.length+' طالب</span></span><button class="btn btn-xs btn-rose" onclick="deleteClass(\''+k+'\')">حذف</button></div>';
+  }).join('');
+}
+function deleteClass(name){
+  delete S.classes[name];var keys=Object.keys(S.classes);
+  S.activeClass=keys.length?keys[0]:null;renderClassesSummary();toast('حُذف: '+name);
+}
+
+/* ============================================================
+   GRADES — with Excel paste support
+============================================================ */
+function renderGrades(){
+  var keys=Object.keys(S.classes);
+  var tabs=document.getElementById('classTabs'),content=document.getElementById('gradesContent');
+  if(!keys.length){tabs.innerHTML='';content.innerHTML='<div class="empty"><div class="empty-icon">📝</div><p>أضف صفاً أولاً</p></div>';return;}
+  if(!S.activeClass||!S.classes[S.activeClass]) S.activeClass=keys[0];
+  tabs.innerHTML=keys.map(function(k,ki){
+    var col=CLASS_COLORS[ki%CLASS_COLORS.length],isA=S.activeClass===k;
+    return '<div class="tab'+(isA?' active':'')+'" onclick="switchClass(\''+k+'\')"'+(isA?' style="background:'+col+';border-color:'+col+'"':'')+'>'+k+'</div>';
+  }).join('');
+  var cls=S.classes[S.activeClass],qs=S.questions;
+  if(!qs.length){content.innerHTML='<div class="empty"><div class="empty-icon">⚙️</div><p>أضف أسئلة أولاً</p></div>';return;}
+  var html='<div class="card" style="overflow-x:auto"><table class="grades-table" id="gradesTable"><thead><tr><th style="text-align:right;min-width:150px">اسم الطالب</th>';
+  qs.forEach(function(q,i){html+='<th>س'+(i+1)+'<br><span style="font-size:10px;font-weight:400;color:#aaa">'+q.text+'</span><br><span style="font-size:10px;color:#2ecc8f;font-weight:700">/'+q.maxMark+'</span></th>';});
+  html+='</tr></thead><tbody>';
+  cls.students.forEach(function(st,si){
+    html+='<tr><td>'+st.name+'</td>';
+    qs.forEach(function(q,qi){
+      var val=st.grades['q'+qi];
+      html+='<td><input class="g-input" type="number" min="0" max="'+q.maxMark+'"'
+        +' value="'+(val!==undefined&&val!==''?val:'')+'"'
+        +' data-si="'+si+'" data-qi="'+qi+'" data-max="'+q.maxMark+'"'
+        +' onchange="updateGrade(this)" oninput="checkOver(this)"'
+        +' onpaste="handlePaste(event,'+si+','+qi+')"/></td>';
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table></div>';
+  content.innerHTML=html;
+}
+function switchClass(name){S.activeClass=name;renderGrades();}
+function checkOver(inp){parseFloat(inp.value)>parseFloat(inp.dataset.max)?inp.classList.add('over'):inp.classList.remove('over');}
+function updateGrade(inp){
+  var si=parseInt(inp.dataset.si),qi=parseInt(inp.dataset.qi),max=parseFloat(inp.dataset.max),v=parseFloat(inp.value);
+  if(isNaN(v)||v<0) v=0;
+  if(v>max){v=max;inp.value=max;toast('الحد الأقصى هو '+max,'warn');}
+  inp.classList.remove('over');
+  S.classes[S.activeClass].students[si].grades['q'+qi]=v;
+}
+
+/* Excel paste handler — reads tab-separated or newline-separated values */
+function handlePaste(e,startSi,startQi){
+  var text=(e.clipboardData||window.clipboardData).getData('text');
+  if(!text) return;
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  if(lines.length<=1&&text.indexOf('\t')===-1) return; /* single value — let default handle */
+  e.preventDefault();
+  var cls=S.classes[S.activeClass];var qs=S.questions;
+  /* Parse: each line = one row, tabs separate columns */
+  var rows=lines.map(function(l){return l.split('\t');});
+  var changed=0;
+  rows.forEach(function(cols,ri){
+    var si=startSi+ri;
+    if(si>=cls.students.length) return;
+    cols.forEach(function(cell,ci){
+      var qi=startQi+ci;if(qi>=qs.length) return;
+      var max=qs[qi].maxMark;
+      var v=parseFloat(cell.replace(',','.'));
+      if(isNaN(v)||v<0) v=0;
+      if(v>max) v=max;
+      cls.students[si].grades['q'+qi]=v;changed++;
+    });
+  });
+  if(changed){renderGrades();toast('تم لصق '+changed+' قيمة من Excel ✅','success',3000);}
+}
+
+/* ============================================================
+   ANALYSIS RENDER
+============================================================ */
+function renderGroupedBarChart(classKeys,qs){
+  if(!classKeys.length||!qs.length) return '';
+  var catLabels=['0–40%','41–60%','61–80%','81–100%'];
+  var catColors=['#ff8c69','#f5c842','#5bb8f5','#2ecc8f'];
+  var allBins={};classKeys.forEach(function(k){allBins[k]=getClassBins(S.classes[k].students,qs);});
+  var gMax=1;classKeys.forEach(function(k){allBins[k].forEach(function(v){if(v>gMax) gMax=v;});});
+  var H=180;
+  var html='<div class="chart-container"><div style="display:flex;align-items:flex-end;gap:4px;padding:24px 4px 0 4px">';
+  for(var ci=0;ci<4;ci++){
+    html+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;border-right:'+(ci<3?'1px dashed #e0f4ea':'none')+';padding:0 6px">';
+    html+='<div style="display:flex;align-items:flex-end;gap:4px;height:'+H+'px;width:100%;justify-content:center">';
+    classKeys.forEach(function(k,ki){
+      var cnt=allBins[k][ci],col=CLASS_COLORS[ki%CLASS_COLORS.length];
+      var bH=cnt>0?Math.max(Math.round(cnt/gMax*H),6):0;
+      var bW=Math.min(Math.floor(72/classKeys.length),30);
+      html+='<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:'+H+'px;width:'+bW+'px">';
+      if(cnt>0){
+        html+='<span style="font-size:10px;font-weight:700;color:'+col+';margin-bottom:3px">'+cnt+'</span>';
+        html+='<div style="width:100%;height:'+bH+'px;background:'+col+';border-radius:5px 5px 0 0" title="'+k+': '+cnt+' طالب"></div>';
+      } else {
+        html+='<span style="font-size:10px;color:#ccc;margin-bottom:3px">0</span><div style="width:100%;height:3px;background:#e8f5ee;border-radius:3px 3px 0 0"></div>';
+      }
+      html+='</div>';
+    });
+    html+='</div><div style="font-size:11px;font-weight:700;color:'+catColors[ci]+';margin-top:7px;text-align:center;padding:3px 8px;background:'+catColors[ci]+'18;border-radius:6px;white-space:nowrap">'+catLabels[ci]+'</div></div>';
+  }
+  html+='</div><div style="border-top:2px solid #d4f0e4;margin:4px 4px 0"></div><div class="chart-legend">';
+  classKeys.forEach(function(k,ki){var col=CLASS_COLORS[ki%CLASS_COLORS.length];html+='<div class="legend-item"><div class="legend-dot" style="background:'+col+'"></div>'+k+'</div>';});
+  html+='</div></div>';return html;
+}
+
+function renderAnalysis(){
+  var el=document.getElementById('analysisContent');var keys=Object.keys(S.classes);
+  if(!keys.length||!S.questions.length){el.innerHTML='<div class="empty"><div class="empty-icon">📊</div><p>أضف بيانات أولاً</p></div>';return;}
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var avgPct=tM?Math.round(avg/tM*100):0;
+  var skillHTML=S.skills.map(function(sk,si){
+    var pct=computeSkillPct(allSt,qs,si);if(pct===null) return '';
+    var col=pct>=80?'#2ecc8f':pct>=60?'#f5c842':'#ff8c69';
+    var tc=pct>=80?'#1a8f63':pct>=60?'#7a5e00':'#c04030';
+    return '<div class="bar-wrap"><span class="bar-label-txt" style="color:'+tc+'">'+sk+'</span><div class="bar-track"><div class="bar-fill" style="width:'+pct+'%;background:'+col+'"></div></div><span class="bar-pct" style="color:'+tc+'">'+pct+'%</span></div>';
+  }).join('');
+  var classRows=keys.map(function(k,ki){
+    var col=CLASS_COLORS[ki%CLASS_COLORS.length],sts=S.classes[k].students;
+    var sc=sts.map(function(st){return getStudentTotal(st,qs);});
+    var a2=sc.length?Math.round(sc.reduce(function(x,y){return x+y;},0)/sc.length*10)/10:0;
+    var p=tM?Math.round(a2/tM*100):0;
+    var tc=p>=80?'#1a8f63':p>=60?'#7a5e00':'#c04030';var bg=p>=80?'#e8faf3':p>=60?'#fffbea':'#fff0f5';
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:11px 16px;background:'+bg+';border-radius:12px;margin-bottom:9px;border:1px solid '+col+'44"><span style="font-size:13px;font-weight:700;color:'+col+'">'+k+' <span class="badge">'+sts.length+' طالب</span></span><span style="font-size:14px;font-weight:700;color:'+tc+'">'+a2+'/'+tM+' ('+p+'%)</span></div>';
+  }).join('');
+  el.innerHTML=
+    '<div class="stats-grid">'
+    +'<div class="stat-card"><div class="stat-label">عدد الطلاب</div><div class="stat-value">'+n+'</div></div>'
+    +'<div class="stat-card"><div class="stat-label">متوسط العلامة</div><div class="stat-value">'+avg+'</div></div>'
+    +'<div class="stat-card"><div class="stat-label">النسبة المئوية</div><div class="stat-value">'+avgPct+'%</div></div>'
+    +'<div class="stat-card"><div class="stat-label">عدد الصفوف</div><div class="stat-value">'+keys.length+'</div></div>'
+    +'</div>'
+    +'<div class="card"><div class="card-title">📊 توزيع العلامات — كل صف بعمود مستقل</div>'+renderGroupedBarChart(keys,qs)+'</div>'
+    +'<div class="card"><div class="card-title">🎯 أداء المهارات</div>'+(S.skills.length?skillHTML:'<p style="font-size:12px;color:#6b9980">لم تُضف مهارات</p>')+'</div>'
+    +'<div class="card"><div class="card-title">🏫 تفصيل الصفوف</div>'+classRows+'</div>';
+}
+
+/* ============================================================
+   PDF EXPORT — Arabic-safe via print CSS
+============================================================ */
+function exportPDF(){
+  var keys=Object.keys(S.classes);
+  if(!keys.length||!S.questions.length){toast('لا بيانات كافية للتصدير','warn');return;}
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var teacher=document.getElementById('teacherName').value||'—';
+  var subject=document.getElementById('subject').value||'—';
+  var semester=document.getElementById('semester').value||'—';
+  var year=document.getElementById('year').value||'—';
+  var now=new Date().toLocaleDateString('ar-SA');
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var avgPct=tM?Math.round(avg/tM*100):0;
+
+  /* Get logo src from the header img */
+  var logoSrc=document.getElementById('logoImg').src||'';
+
+  var html='';
+
+  /* Page 1: Summary */
+  html+='<div class="pr-page">';
+  html+='<div class="pr-header">';
+  html+='<img class="pr-logo" src="'+logoSrc+'" onerror="this.style.display=\'none\'"/>';
+  html+='<div class="pr-htxt"><h1>نظام المسوحات الصفية والتقييم البديل</h1><p>مدرسة البخاري الشاملة</p><p>مركزة التقييم: منى مصطفى</p></div></div>';
+  html+='<div class="pr-meta"><span>المعلم: <b>'+teacher+'</b></span><span>المادة: <b>'+subject+'</b></span><span>الفصل: <b>'+semester+'</b></span><span>السنة: <b>'+year+'</b></span><span>التاريخ: <b>'+now+'</b></span></div>';
+  html+='<div class="pr-section-title">الملخص العام</div>';
+  html+='<div class="pr-stats">'
+    +'<div class="pr-stat"><div class="lbl">عدد الطلاب</div><div class="val">'+n+'</div></div>'
+    +'<div class="pr-stat"><div class="lbl">متوسط العلامة</div><div class="val">'+avg+'</div></div>'
+    +'<div class="pr-stat"><div class="lbl">العلامة القصوى</div><div class="val">'+tM+'</div></div>'
+    +'<div class="pr-stat"><div class="lbl">النسبة المئوية</div><div class="val">'+avgPct+'%</div></div>'
+    +'</div>';
+
+  /* Skills */
+  if(S.skills.length){
+    html+='<div class="pr-section-title">أداء المهارات</div>';
+    S.skills.forEach(function(sk,si){
+      var pct=computeSkillPct(allSt,qs,si);if(pct===null) return;
+      var col=pct>=80?'#2ecc8f':pct>=60?'#f5c842':'#ff8c69';
+      var tc=pct>=80?'#1a8f63':pct>=60?'#7a5e00':'#c04030';
+      html+='<div class="pr-skill-row"><span class="pr-skill-name">'+sk+'</span><div class="pr-skill-bar-wrap"><div class="pr-skill-bar" style="width:'+pct+'%;background:'+col+'"></div></div><span class="pr-skill-pct" style="color:'+tc+'">'+pct+'%</span></div>';
+    });
+  }
+
+  /* Classes summary table */
+  html+='<div class="pr-section-title">تفصيل الصفوف</div>';
+  html+='<table class="pr-table"><thead><tr><th>الصف</th><th>عدد الطلاب</th><th>المتوسط</th><th>النسبة %</th><th>التقييم</th></tr></thead><tbody>';
+  keys.forEach(function(k){
+    var sts=S.classes[k].students;
+    var sc=sts.map(function(st){return getStudentTotal(st,qs);});
+    var a2=sc.length?Math.round(sc.reduce(function(x,y){return x+y;},0)/sc.length*10)/10:0;
+    var p=tM?Math.round(a2/tM*100):0;
+    html+='<tr><td>'+k+'</td><td>'+sts.length+'</td><td>'+a2+'/'+tM+'</td><td class="'+pctClass(p)+'">'+p+'%</td><td>'+evalStr(p)+'</td></tr>';
+  });
+  html+='</tbody></table>';
+  html+='<div class="pr-footer">تقرير صادر عن نظام المسوحات الصفية — مدرسة البخاري الشاملة | '+now+'</div>';
+  html+='</div>';
+
+  /* One page per class */
+  keys.forEach(function(k){
+    var cls=S.classes[k];
+    html+='<div class="pr-page">';
+    html+='<div class="pr-header"><img class="pr-logo" src="'+logoSrc+'" onerror="this.style.display=\'none\'"/><div class="pr-htxt"><h1>كشف علامات — الصف: '+k+'</h1><p>المادة: '+subject+' | المعلم: '+teacher+' | '+semester+'</p></div></div>';
+
+    /* Student grades table */
+    html+='<table class="pr-table"><thead><tr><th style="text-align:right">اسم الطالب</th>';
+    qs.forEach(function(q,i){html+='<th>س'+(i+1)+' /'+q.maxMark+'</th>';});
+    html+='<th>المجموع</th><th>%</th><th>التقييم</th></tr></thead><tbody>';
+    cls.students.forEach(function(st){
+      var tot=getStudentTotal(st,qs);var pct=tM?Math.round(tot/tM*100):0;
+      html+='<tr><td>'+st.name+'</td>';
+      qs.forEach(function(q,qi){var v=st.grades['q'+qi];html+='<td>'+(v!==undefined&&v!==''?v:'—')+'</td>';});
+      html+='<td><b>'+tot+'</b></td><td class="'+pctClass(pct)+'">'+pct+'%</td><td>'+evalStr(pct)+'</td></tr>';
+    });
+    html+='</tbody></table>';
+
+    /* Skills for this class */
+    if(S.skills.length){
+      html+='<div class="pr-section-title" style="font-size:10pt;margin-top:10px">أداء المهارات في هذا الصف</div>';
+      S.skills.forEach(function(sk,si){
+        var pct=computeSkillPct(cls.students,qs,si);if(pct===null) return;
+        var col=pct>=80?'#2ecc8f':pct>=60?'#f5c842':'#ff8c69';
+        var tc=pct>=80?'#1a8f63':pct>=60?'#7a5e00':'#c04030';
+        html+='<div class="pr-skill-row"><span class="pr-skill-name">'+sk+'</span><div class="pr-skill-bar-wrap"><div class="pr-skill-bar" style="width:'+pct+'%;background:'+col+'"></div></div><span class="pr-skill-pct" style="color:'+tc+'">'+pct+'%</span></div>';
+      });
+    }
+    html+='<div class="pr-footer">'+k+' — '+now+'</div>';
+    html+='</div>';
+  });
+
+  document.getElementById('printReport').innerHTML=html;
+  toast('جارٍ فتح نافذة الطباعة...','',1500);
+  setTimeout(function(){window.print();},400);
+}
+
+/* ============================================================
+   EXCEL EXPORT
+============================================================ */
+function exportExcel(){
+  var keys=Object.keys(S.classes);
+  if(!keys.length||!S.questions.length){toast('لا بيانات كافية','warn');return;}
+  toast('جارٍ إنشاء ملف Excel...','');
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var teacher=document.getElementById('teacherName').value||'';
+  var subject=document.getElementById('subject').value||'';
+  var semester=document.getElementById('semester').value||'';
+  var year=document.getElementById('year').value||'';
+  var now=new Date().toLocaleString('ar-SA');
+  var wb=XLSX.utils.book_new();
+
+  /* Sheet 1 - ملخص */
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var avgPct=tM?Math.round(avg/tM*100):0;
+  var sumData=[
+    ['نظام المسوحات الصفية — مدرسة البخاري الشاملة — مركزة التقييم: منى مصطفى'],
+    [],
+    ['المعلم',teacher,'المادة',subject,'الفصل',semester,'السنة',year,'التاريخ',now],
+    [],
+    ['ملخص النتائج'],
+    ['عدد الطلاب','متوسط العلامة','العلامة القصوى','النسبة %','عدد الصفوف'],
+    [n,avg,tM,avgPct+'%',keys.length],
+    [],
+    ['أداء المهارات'],['المهارة','النسبة %','التقييم']
+  ];
+  S.skills.forEach(function(sk,si){
+    var pct=computeSkillPct(allSt,qs,si);
+    sumData.push([sk,pct!==null?pct+'%':'—',pct!==null?evalStr(pct):'—']);
+  });
+  sumData.push([],['توزيع العلامات'],['الصف','0-40%','41-60%','61-80%','81-100%']);
+  keys.forEach(function(k){sumData.push([k].concat(getClassBins(S.classes[k].students,qs)));});
+  var ws0=XLSX.utils.aoa_to_sheet(sumData);
+  ws0['!cols']=[{wch:24},{wch:14},{wch:14},{wch:14},{wch:12},{wch:14},{wch:14},{wch:14},{wch:14},{wch:22}];
+  XLSX.utils.book_append_sheet(wb,ws0,'الملخص العام');
+
+  /* Sheet per class */
+  keys.forEach(function(k){
+    var cls=S.classes[k];
+    var hdr=['اسم الطالب'];
+    qs.forEach(function(q,i){hdr.push('س'+(i+1)+' - '+q.text+' /'+q.maxMark);});
+    hdr.push('المجموع','النسبة %','التقييم');
+    var rows=[hdr];
+    cls.students.forEach(function(st){
+      var tot=getStudentTotal(st,qs),pct=tM?Math.round(tot/tM*100):0;
+      var row=[st.name];
+      qs.forEach(function(q,qi){var v=st.grades['q'+qi];row.push(v!==undefined&&v!==''?v:0);});
+      row.push(tot,pct+'%',evalStr(pct));rows.push(row);
+    });
+    rows.push([],['أداء المهارات في هذا الصف'],['المهارة','النسبة %','التقييم']);
+    S.skills.forEach(function(sk,si){
+      var pct=computeSkillPct(cls.students,qs,si);
+      rows.push([sk,pct!==null?pct+'%':'—',pct!==null?evalStr(pct):'—']);
+    });
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    var cols=[{wch:24}];qs.forEach(function(){cols.push({wch:20});});cols.push({wch:10},{wch:10},{wch:12});
+    ws['!cols']=cols;
+    XLSX.utils.book_append_sheet(wb,ws,'الصف '+k.replace(/[\\\/\*\[\]:?]/g,''));
+  });
+
+  /* Sheet - جميع الطلاب */
+  var aHdr=['الصف','اسم الطالب'];
+  qs.forEach(function(q,i){aHdr.push('س'+(i+1)+'/'+q.maxMark);});
+  aHdr.push('المجموع','النسبة %','التقييم');
+  var aRows=[aHdr];
+  keys.forEach(function(k){
+    S.classes[k].students.forEach(function(st){
+      var tot=getStudentTotal(st,qs),pct=tM?Math.round(tot/tM*100):0;
+      var row=[k,st.name];
+      qs.forEach(function(q,qi){var v=st.grades['q'+qi];row.push(v!==undefined&&v!==''?v:0);});
+      row.push(tot,pct+'%',evalStr(pct));aRows.push(row);
+    });
+  });
+  var wsA=XLSX.utils.aoa_to_sheet(aRows);
+  wsA['!cols']=[{wch:14},{wch:24}].concat(qs.map(function(){return{wch:12};})).concat([{wch:10},{wch:10},{wch:12}]);
+  XLSX.utils.book_append_sheet(wb,wsA,'جميع الطلاب');
+
+  XLSX.writeFile(wb,'تقرير_مسح_'+subject+'_'+year+'.xlsx');
+  toast('تم تحميل Excel بنجاح ✅','success',4000);
+}
+
+/* ============================================================
+   SEND MODAL LOGIC
+============================================================ */
+var _sendMethod=null; // 'email' | 'whatsapp'
+
+function openSendModal(){
+  var keys=Object.keys(S.classes);
+  if(!keys.length||!S.questions.length){toast('لا توجد بيانات كافية للإرسال','warn');return;}
+  _sendMethod=null;
+  goStep1();
+  document.getElementById('sendModal').classList.add('open');
+}
+function closeSendModal(){
+  document.getElementById('sendModal').classList.remove('open');
+  _sendMethod=null;
+}
+
+function selectMethod(m){
+  _sendMethod=m;
+  document.getElementById('mc-email').classList.remove('selected');
+  document.getElementById('mc-wa').classList.remove('selected');
+  document.getElementById('mc-'+m).classList.add('selected');
+  var btn=document.getElementById('step1Next');
+  btn.disabled=false;btn.style.opacity='1';btn.style.cursor='pointer';
+}
+
+function goStep1(){
+  document.getElementById('sendStep1').style.display='block';
+  document.getElementById('sendStep2').style.display='none';
+  document.getElementById('sendStep3').style.display='none';
+}
+
+function goStep2(){
+  if(!_sendMethod){toast('اختر طريقة الإرسال أولاً','warn');return;}
+  document.getElementById('sendStep1').style.display='none';
+  document.getElementById('sendStep2').style.display='block';
+  document.getElementById('sendStep3').style.display='none';
+
+  var subject=document.getElementById('subject').value||'المادة';
+  if(_sendMethod==='email'){
+    document.getElementById('step2Title').textContent='البريد الإلكتروني للمركزة';
+    document.getElementById('step2Sub').textContent='أدخل عنوان البريد الإلكتروني لمركزة التقييم';
+    document.getElementById('contactLabel').textContent='البريد الإلكتروني';
+    document.getElementById('contactInput').type='email';
+    document.getElementById('contactInput').placeholder='mona@school.edu.jo';
+    document.getElementById('sendInfoBox').className='send-info-box';
+    document.getElementById('sendInfoBox').innerHTML='📎 سيتم تحضير ملف Excel وفتح تطبيق البريد الإلكتروني مع بيانات التقرير. قم بإرفاق الملفات يدوياً إن لزم.';
+  } else {
+    document.getElementById('step2Title').textContent='رقم هاتف المركزة (واتساب)';
+    document.getElementById('step2Sub').textContent='أدخل رقم هاتف مركزة التقييم مع رمز الدولة';
+    document.getElementById('contactLabel').textContent='رقم الهاتف (مع رمز الدولة)';
+    document.getElementById('contactInput').type='tel';
+    document.getElementById('contactInput').placeholder='962791234567';
+    document.getElementById('sendInfoBox').className='send-info-box wa-box';
+    document.getElementById('sendInfoBox').innerHTML='💬 سيتم تحضير ملف Excel للتنزيل ثم فتح واتساب ويب مع رسالة تحتوي على ملخص التقرير الكامل.';
+  }
+}
+
+function goStep3(){
+  var contact=document.getElementById('contactInput').value.trim();
+  if(!contact){toast('أدخل بيانات التواصل أولاً','warn');return;}
+  if(_sendMethod==='email' && !contact.includes('@')){toast('أدخل بريداً إلكترونياً صحيحاً','warn');return;}
+  if(_sendMethod==='whatsapp' && !/^[0-9]{7,15}$/.test(contact.replace(/[\s+\-]/g,''))){toast('أدخل رقم هاتف صحيحاً','warn');return;}
+
+  document.getElementById('sendStep2').style.display='none';
+  document.getElementById('sendStep3').style.display='block';
+
+  if(_sendMethod==='email'){
+    doSendEmail(contact);
+  } else {
+    doSendWhatsApp(contact);
+  }
+}
+
+/* ---- build report summary text ---- */
+function buildReportSummaryText(){
+  var keys=Object.keys(S.classes);
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var teacher=document.getElementById('teacherName').value||'—';
+  var subject=document.getElementById('subject').value||'—';
+  var semester=document.getElementById('semester').value||'—';
+  var year=document.getElementById('year').value||'—';
+  var now=new Date().toLocaleDateString('ar-SA');
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var avgPct=tM?Math.round(avg/tM*100):0;
+
+  var lines=[
+    '📊 تقرير المسح الصفي — مدرسة البخاري الشاملة',
+    '━━━━━━━━━━━━━━━━━━━━',
+    'المعلم: '+teacher,
+    'المادة: '+subject,
+    'الفصل: '+semester+' | السنة: '+year,
+    'التاريخ: '+now,
+    '━━━━━━━━━━━━━━━━━━━━',
+    '📌 الملخص العام:',
+    'عدد الطلاب: '+n,
+    'متوسط العلامة: '+avg+'/'+tM,
+    'النسبة المئوية: '+avgPct+'%',
+    '━━━━━━━━━━━━━━━━━━━━',
+    '🏫 نتائج الصفوف:'
+  ];
+  keys.forEach(function(k){
+    var sts=S.classes[k].students;
+    var sc=sts.map(function(st){return getStudentTotal(st,qs);});
+    var a2=sc.length?Math.round(sc.reduce(function(x,y){return x+y;},0)/sc.length*10)/10:0;
+    var p=tM?Math.round(a2/tM*100):0;
+    lines.push('• '+k+': '+a2+'/'+tM+' ('+p+'%) — '+evalStr(p));
+  });
+  if(S.skills.length){
+    lines.push('━━━━━━━━━━━━━━━━━━━━','🎯 أداء المهارات:');
+    S.skills.forEach(function(sk,si){
+      var pct=computeSkillPct(allSt,qs,si);
+      lines.push('• '+sk+': '+(pct!==null?pct+'%':'—'));
+    });
+  }
+  lines.push('━━━━━━━━━━━━━━━━━━━━','صادر عن نظام المسوحات الصفية — مدرسة البخاري الشاملة');
+  return lines.join('\n');
+}
+
+/* ---- animate progress bar ---- */
+function animateProgress(pct,dur,cb){
+  var el=document.getElementById('progressFill');
+  el.style.width=pct+'%';
+  if(cb) setTimeout(cb,dur);
+}
+
+/* ---- EMAIL ---- */
+function doSendEmail(email){
+  setStep3Body('⏳','جارٍ تحضير ملف Excel...',false);
+  animateProgress(30,400,function(){
+
+    /* 1. export Excel */
+    try{ exportExcelSilent(); } catch(e){ console.warn('excel err',e); }
+    animateProgress(60,600,function(){
+
+      /* 2. show instruction */
+      setStep3Body('📧','جارٍ فتح تطبيق البريد الإلكتروني...',false);
+      animateProgress(85,700,function(){
+
+        /* 3. open mailto */
+        var subject_=encodeURIComponent('تقرير المسح الصفي — '+
+          (document.getElementById('subject').value||'المادة')+' — '+
+          (document.getElementById('year').value||''));
+        var body_=encodeURIComponent(buildReportSummaryText()+
+          '\n\n[ملاحظة: يرجى إرفاق ملف Excel المحمَّل مع هذا البريد]');
+        window.location.href='mailto:'+email+'?subject='+subject_+'&body='+body_;
+
+        animateProgress(100,500,function(){
+          setStep3Body('✅',
+            '<b>تم تحضير الملفات!</b><br><br>'
+            +'<span style="font-size:12px;color:#4a7a60">'
+            +'1. تم تنزيل ملف Excel على جهازك<br>'
+            +'2. تم فتح تطبيق البريد إلى: <b>'+email+'</b><br>'
+            +'3. أرفق ملف Excel من مجلد التنزيلات ثم أرسل'
+            +'</span>',true);
+          /* also send to sheets */
+          sendToSheetsBackground();
+        });
+      });
+    });
+  });
+}
+
+/* ---- WHATSAPP ---- */
+function doSendWhatsApp(phone){
+  setStep3Body('⏳','جارٍ تحضير ملف Excel...',false);
+  animateProgress(30,400,function(){
+
+    try{ exportExcelSilent(); } catch(e){ console.warn('excel err',e); }
+    animateProgress(65,600,function(){
+      setStep3Body('💬','جارٍ فتح واتساب...',false);
+      animateProgress(85,700,function(){
+
+        /* clean phone */
+        var ph=phone.replace(/[\s+\-]/g,'');
+        var msg=encodeURIComponent(buildReportSummaryText());
+        window.open('https://wa.me/'+ph+'?text='+msg,'_blank');
+
+        animateProgress(100,500,function(){
+          setStep3Body('✅',
+            '<b>تم!</b><br><br>'
+            +'<span style="font-size:12px;color:#4a7a60">'
+            +'1. تم تنزيل ملف Excel على جهازك<br>'
+            +'2. تم فتح واتساب مع ملخص التقرير<br>'
+            +'3. بعد الإرسال، أرفق ملف Excel يدوياً من واتساب'
+            +'</span>',true);
+          sendToSheetsBackground();
+        });
+      });
+    });
+  });
+}
+
+function setStep3Body(icon,msg,done){
+  document.getElementById('step3Title').textContent=done?'تم الإرسال ✓':'جارٍ الإرسال...';
+  document.getElementById('step3Body').innerHTML=
+    '<div style="font-size:38px;margin-bottom:12px">'+icon+'</div>'
+    +'<p style="color:#1a2e22;font-size:13px;line-height:1.7">'+msg+'</p>';
+  document.getElementById('closeAfterSend').style.display=done?'block':'none';
+  document.getElementById('progressWrap').style.display=done?'none':'block';
+}
+
+/* ---- Silent Excel export (no toast) ---- */
+function exportExcelSilent(){
+  var keys=Object.keys(S.classes);
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var teacher=document.getElementById('teacherName').value||'';
+  var subject=document.getElementById('subject').value||'';
+  var semester=document.getElementById('semester').value||'';
+  var year=document.getElementById('year').value||'';
+  var now=new Date().toLocaleString('ar-SA');
+  var wb=XLSX.utils.book_new();
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var avgPct=tM?Math.round(avg/tM*100):0;
+  var sumData=[
+    ['نظام المسوحات الصفية — مدرسة البخاري الشاملة — مركزة التقييم: منى مصطفى'],
+    [],
+    ['المعلم',teacher,'المادة',subject,'الفصل',semester,'السنة',year,'التاريخ',now],
+    [],
+    ['ملخص النتائج'],
+    ['عدد الطلاب','متوسط العلامة','العلامة القصوى','النسبة %','عدد الصفوف'],
+    [n,avg,tM,avgPct+'%',keys.length],
+    [],
+    ['أداء المهارات'],['المهارة','النسبة %','التقييم']
+  ];
+  S.skills.forEach(function(sk,si){
+    var pct=computeSkillPct(allSt,qs,si);
+    sumData.push([sk,pct!==null?pct+'%':'—',pct!==null?evalStr(pct):'—']);
+  });
+  sumData.push([],['توزيع العلامات'],['الصف','0-40%','41-60%','61-80%','81-100%']);
+  keys.forEach(function(k){sumData.push([k].concat(getClassBins(S.classes[k].students,qs)));});
+  var ws0=XLSX.utils.aoa_to_sheet(sumData);
+  ws0['!cols']=[{wch:24},{wch:14},{wch:14},{wch:14},{wch:12},{wch:14},{wch:14},{wch:14},{wch:14},{wch:22}];
+  XLSX.utils.book_append_sheet(wb,ws0,'الملخص العام');
+  keys.forEach(function(k){
+    var cls=S.classes[k];
+    var hdr=['اسم الطالب'];
+    qs.forEach(function(q,i){hdr.push('س'+(i+1)+' - '+q.text+' /'+q.maxMark);});
+    hdr.push('المجموع','النسبة %','التقييم');
+    var rows=[hdr];
+    cls.students.forEach(function(st){
+      var tot=getStudentTotal(st,qs),pct=tM?Math.round(tot/tM*100):0;
+      var row=[st.name];
+      qs.forEach(function(q,qi){var v=st.grades['q'+qi];row.push(v!==undefined&&v!==''?v:0);});
+      row.push(tot,pct+'%',evalStr(pct));rows.push(row);
+    });
+    rows.push([],['أداء المهارات'],['المهارة','النسبة %','التقييم']);
+    S.skills.forEach(function(sk,si){
+      var pct=computeSkillPct(cls.students,qs,si);
+      rows.push([sk,pct!==null?pct+'%':'—',pct!==null?evalStr(pct):'—']);
+    });
+    var ws=XLSX.utils.aoa_to_sheet(rows);
+    var cols=[{wch:24}];qs.forEach(function(){cols.push({wch:20});});cols.push({wch:10},{wch:10},{wch:12});
+    ws['!cols']=cols;
+    XLSX.utils.book_append_sheet(wb,ws,'الصف '+k.replace(/[\\\/\*\[\]:?]/g,''));
+  });
+  var aHdr=['الصف','اسم الطالب'];
+  qs.forEach(function(q,i){aHdr.push('س'+(i+1)+'/'+q.maxMark);});
+  aHdr.push('المجموع','النسبة %','التقييم');
+  var aRows=[aHdr];
+  keys.forEach(function(k){
+    S.classes[k].students.forEach(function(st){
+      var tot=getStudentTotal(st,qs),pct=tM?Math.round(tot/tM*100):0;
+      var row=[k,st.name];
+      qs.forEach(function(q,qi){var v=st.grades['q'+qi];row.push(v!==undefined&&v!==''?v:0);});
+      row.push(tot,pct+'%',evalStr(pct));aRows.push(row);
+    });
+  });
+  var wsA=XLSX.utils.aoa_to_sheet(aRows);
+  wsA['!cols']=[{wch:14},{wch:24}].concat(qs.map(function(){return{wch:12};})).concat([{wch:10},{wch:10},{wch:12}]);
+  XLSX.utils.book_append_sheet(wb,wsA,'جميع الطلاب');
+  XLSX.writeFile(wb,'تقرير_مسح_'+(subject||'مسح')+'_'+(year||'2024')+'.xlsx');
+}
+
+/* ============================================================
+   SEND TO GOOGLE SHEETS (background, silent)
+============================================================ */
+function sendToSheetsBackground(){
+  var keys=Object.keys(S.classes);
+  var qs=S.questions,tM=qs.reduce(function(a,q){return a+q.maxMark;},0);
+  var allSt=[];keys.forEach(function(k){allSt=allSt.concat(S.classes[k].students);});
+  var scores=allSt.map(function(st){return getStudentTotal(st,qs);});
+  var n=allSt.length,avg=n?Math.round(scores.reduce(function(a,b){return a+b;},0)/n*10)/10:0;
+  var skillsSummary={};S.skills.forEach(function(sk,si){skillsSummary[sk]=computeSkillPct(allSt,qs,si);});
+  var classesSummary={};
+  keys.forEach(function(k){
+    var sts=S.classes[k].students,sc=sts.map(function(st){return getStudentTotal(st,qs);});
+    var a=sc.length?Math.round(sc.reduce(function(x,y){return x+y;},0)/sc.length*10)/10:0;
+    classesSummary[k]={students:sts.length,average:a,percentage:tM?Math.round(a/tM*100):0};
+  });
+  var payload={
+    teacher:document.getElementById('teacherName').value||'',
+    subject:document.getElementById('subject').value||'',
+    semester:document.getElementById('semester').value||'',
+    year:document.getElementById('year').value||'',
+    totalStudents:n,totalMax:tM,averageGrade:avg,
+    averagePercent:tM?Math.round(avg/tM*100):0,
+    skills:S.skills,skillsSummary:skillsSummary,classesSummary:classesSummary,
+    detailedData:keys.map(function(k){
+      return {className:k,students:S.classes[k].students.map(function(st){
+        var tot=getStudentTotal(st,qs);
+        return{name:st.name,total:tot,percent:tM?Math.round(tot/tM*100):0,grades:st.grades};
+      })};
+    }),
+    timestamp:new Date().toISOString()
+  };
+  fetch(WEB_APP_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
+  .then(function(){console.log('Sheets sync OK');})
+  .catch(function(e){console.warn('Sheets sync failed',e);});
+}
+
+/* keep old setSendingState for sendStatusBox updates */
+function setSendingState(on){
+  var b1=document.getElementById('sendBtnHeader'),b2=document.getElementById('sendBtn2'),box=document.getElementById('sendStatusBox');
+  if(on){if(b1)b1.disabled=true;if(b2)b2.disabled=true;if(box)box.innerHTML='<div class="send-status sending"><div class="spinner"></div>جارٍ المزامنة...</div>';}
+  else{if(b1)b1.disabled=false;if(b2)b2.disabled=false;}
+}
+</script>
+</body>
+</html>
